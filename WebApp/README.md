@@ -1,16 +1,30 @@
-# React + Vite
+Realtime Chat • Firebase • React • Works on Mobile + Desktop
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+This project is a personal private chat application built using React + Firebase Firestore.
+Only two people can access this chat by logging in with a shared secret key, making it a secure and private conversation room — similar to Telegram style UI, responsive on both phone and desktop.
 
-Currently, two official plugins are available:
-
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
-
-## React Compiler
-
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+🚀 Features
+Feature	Status
+🔐 Private chat with shared key login	✔
+🔥 Realtime messages using Firestore	✔
+💬 Clean UI with chat bubbles	✔
+📱 Responsive for Android + Desktop	✔
+⏳ Auto scroll to latest message	✔
+❌ No third-user access	✔
+🛠 Tech Stack
+Technology	Purpose
+React (Vite)	UI Application
+Firebase Firestore	Realtime chat database
+JavaScript ES6	Logic implementation
+CSS inline styles	UI Design
+Vercel	Hosting (recommended)
+📂 Project Structure
+📁 my-chat-app
+ ├─ src/
+ │  ├─ firebase.js        # Firebase config + Firestore init
+ │  ├─ App.jsx            # App login + session control
+ │  ├─ Login.jsx          # Secret key + username input
+ │  └─ Chat.jsx           # Main realtime chat UI
+ ├─ index.css
+ ├─ package.json
+ └─ vite.config.js
