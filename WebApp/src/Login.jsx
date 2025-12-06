@@ -1,101 +1,40 @@
-// src/Login.jsx
 import { useState } from "react";
 
-const SECRET_KEY = "divi@1619"; // 🔐 change this & share only with your friend
+const SECRET_KEY = "divi@1619"; // Change + share only with friend 🔐
 
 export default function Login({ onLogin }) {
-  const [name, setName] = useState("");
-  const [password, setPassword] = useState("");
+  const [name,setName]=useState("");
+  const [key,setKey]=useState("");
 
-  const handleSubmit = (e) => {
+  const login = (e)=>{
     e.preventDefault();
+    if(key !== SECRET_KEY) return alert("Wrong Secret Key ❌");
+    if(!name.trim()) return;
 
-    if (password !== SECRET_KEY) {
-      alert("❌ Wrong secret key");
-      return;
-    }
-
-    if (!name.trim()) {
-      alert("Please enter your name");
-      return;
-    }
-
-    onLogin(name.trim());
+    onLogin(name);
   };
 
   return (
-    <div
-      style={{
-        minHeight: "100vh",
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        background: "#0f172a",
-        color: "white",
-      }}
-    >
-      <form
-        onSubmit={handleSubmit}
-        style={{
-          background: "#1e293b",
-          padding: "24px",
-          borderRadius: "12px",
-          width: "90%",
-          maxWidth: "360px",
-          boxShadow: "0 10px 25px rgba(0,0,0,0.4)",
-        }}
-      >
-        <h2 style={{ textAlign: "center", marginBottom: "16px" }}>
-          🔐 Chat
-        </h2>
+    <div style={styles.page}>
+      <form onSubmit={login} style={styles.box}>
+        
+        <h2 style={{textAlign:"center"}}>💙 Private Chat Login</h2>
 
-        <label>Username</label>
-        <input
-          type="text"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          placeholder="Enter your name"
-          style={{
-            width: "100%",
-            padding: "10px",
-            margin: "8px 0 16px",
-            borderRadius: "8px",
-            border: "none",
-          }}
-        />
+        <label>Name</label>
+        <input value={name} onChange={e=>setName(e.target.value)} style={styles.input}/>
 
         <label>Secret Key</label>
-        <input
-          type="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          placeholder="Shared secret key"
-          style={{
-            width: "100%",
-            padding: "10px",
-            margin: "8px 0 16px",
-            borderRadius: "8px",
-            border: "none",
-          }}
-        />
+        <input type="password" value={key} onChange={e=>setKey(e.target.value)} style={styles.input}/>
 
-        <button
-          type="submit"
-          style={{
-            width: "100%",
-            padding: "10px",
-            borderRadius: "8px",
-            border: "none",
-            background: "#3b82f6",
-            color: "white",
-            fontWeight: "bold",
-            cursor: "pointer",
-            marginTop: "8px",
-          }}
-        >
-          Enter Chat 💬
-        </button>
+        <button style={styles.btn}>Enter Chat 💬</button>
       </form>
     </div>
   );
 }
+
+const styles={
+  page:{display:"flex",justifyContent:"center",alignItems:"center",height:"100vh",background:"#0E1621"},
+  box:{background:"#1A2332",padding:25,borderRadius:15,width:"85%",maxWidth:340,color:"#fff"},
+  input:{width:"100%",padding:10,margin:"10px 0",borderRadius:8,border:"none",background:"#0E1621",color:"#fff"},
+  btn:{width:"100%",padding:10,border:"none",borderRadius:8,background:"#1976D2",color:"#fff",fontSize:16}
+};

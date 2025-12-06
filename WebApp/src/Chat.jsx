@@ -1,162 +1,202 @@
 import { useEffect, useRef, useState } from "react";
 import { db } from "./firebase";
 import {
-  addDoc,
-  collection,
-  onSnapshot,
-  orderBy,
-  query,
-  serverTimestamp,
+  addDoc, collection, query, orderBy, onSnapshot,
+  serverTimestamp, doc, updateDoc, onSnapshot as watchDoc
 } from "firebase/firestore";
 
-export default function Chat({ username, onLogout }) {
+export default function Chat({ username }) {
+
   const [msg, setMsg] = useState("");
   const [messages, setMessages] = useState([]);
+  const [friendStatus, setFriendStatus] = useState(null);
   const bottomRef = useRef(null);
 
+
+  /* 🔥 REAL-TIME MESSAGES + AUTO-SEEN SYSTEM */
   useEffect(() => {
-    const q = query(collection(db, "privateChat"), orderBy("createdAt", "asc"));
-    const unsub = onSnapshot(q, (snap) => {
-      setMessages(snap.docs.map((d) => ({ id: d.id, ...d.data() })));
-      setTimeout(() => bottomRef.current?.scrollIntoView({ behavior: "smooth" }), 100);
-    });
-    return unsub;
-  }, []);
+    const q = query(collection(db,"privateChat"),orderBy("createdAt","asc"));
 
-  const send = async (e) => {
+    return onSnapshot(q, async snap=>{
+      const docs = snap.docs;
+      setMessages(docs.map(m=>({id:m.id,...m.data()})));
+
+      docs.forEach(m=>{
+        const d=m.data();
+        if(d.user !== username && !d.seen){
+          updateDoc(doc(db,"privateChat",m.id),{
+            seen:true,
+            seenAt:serverTimestamp()
+          });
+        }
+      });
+
+      setTimeout(()=>bottomRef.current?.scrollIntoView({behavior:"smooth"}),100);
+    });
+  },[]);
+
+
+
+  /* 🔹 SEND MESSAGE (✔ delivered, ✔✔ later seen) */
+  const send = async(e)=>{
     e.preventDefault();
+    if(!msg.trim()) return;
 
-    const trimmed = msg.trim();
-    if (!trimmed) return;
-
-    setMsg(""); // clear immediately to avoid double send
-
-    await addDoc(collection(db, "privateChat"), {
-      text: trimmed,
-      user: username,
-      createdAt: serverTimestamp(),
+    await addDoc(collection(db,"privateChat"),{
+      text:msg.trim(),
+      user:username,
+      createdAt:serverTimestamp(),
+      delivered:true,
+      seen:false,
+      seenAt:null
     });
+
+    setMsg("");
   };
 
-  return (
-    <div style={styles.screen}>
 
-      {/* HEADER */}
-      <header style={styles.header}>
-        <div style={{fontWeight:700, fontSize:"18px"}}>💙 Chat</div>
-        <div style={{fontSize:"13px", opacity:0.7}}>Logged in as: {username}</div>
 
-        <button onClick={onLogout} style={styles.logout}>
-          Logout
-        </button>
+  /* 🔵 Typing indicator */
+  const typing=(e)=>{
+    setMsg(e.target.value);
+    updateDoc(doc(db,"presence",username),{typing:true});
+    setTimeout(()=>updateDoc(doc(db,"presence",username),{typing:false}),900);
+  };
+
+
+
+  /* 🟢 AUTO-DETECT OTHER USER + LAST SEEN */
+  useEffect(()=>{
+    return watchDoc(collection(db,"presence"),snap=>{
+      snap.docs.forEach(d=>{
+        if(d.id !== username) setFriendStatus(d.data()); // automatically identify FRIEND
+      });
+    });
+  },[]);
+
+
+
+  /* 🕒 Save LAST SEEN when closing */
+  useEffect(()=>{
+    const offline=()=>updateDoc(doc(db,"presence",username),{
+      online:false,lastSeen:serverTimestamp(),typing:false
+    });
+    window.addEventListener("beforeunload",offline);
+    return offline;
+  },[]);
+
+
+
+  return(
+    <div style={s.screen}>
+
+      {/* 🔥 HEADER WITH ONLINE + LAST SEEN + TYPING + LOGOUT */}
+      <header style={s.header}>
+
+        <div>
+          <b style={{fontSize:17}}>Chat Room</b><br/>
+
+          <span style={{fontSize:12,opacity:.75}}>
+
+          {/* SHOW STATUS */}
+          {friendStatus?.online ?
+            `Online 🟢 (Last seen ${friendStatus?.lastSeen?.toDate?.()?.toLocaleTimeString([], {hour:"2-digit",minute:"2-digit"})})`
+            :
+            friendStatus?.lastSeen ?
+              `Last seen ${friendStatus.lastSeen.toDate().toLocaleTimeString([], {hour:"2-digit",minute:"2-digit"})}`
+              :
+              "Offline"
+          }
+
+          {/* Typing indicator */}
+          {friendStatus?.typing && " • Typing... 🔵"}
+
+          </span>
+        </div>
+
+        {/* LOGOUT BUTTON */}
+        <button style={s.logout} onClick={()=>{
+          localStorage.clear();
+          window.location.reload();
+        }}>Logout 🚪</button>
       </header>
 
-      {/* CHAT BOX */}
-      <div style={styles.chatBox}>
-        {messages.map((m) => {
-          const mine = m.user === username;
-          return (
-            <div key={m.id} style={{
-              display:"flex",
-              justifyContent: mine ? "flex-end" : "flex-start",
-              padding:"4px"
-            }}>
+
+
+
+      {/* 🔥 CHAT BUBBLES */}
+      <div style={s.chat}>
+        {messages.map((m,i)=>{
+          const me = m.user === username;
+
+          return(
+            <div key={i} style={{display:"flex",justifyContent:me?"flex-end":"flex-start",padding:4}}>
+              
               <div style={{
-                ...styles.bubble,
-                background: mine ? "#1976D2" : "#263240",
-                borderBottomRightRadius: mine ? "6px" : "16px",
-                borderBottomLeftRadius: mine ? "16px" : "6px",
+                ...s.bubble,
+                background:me?"#1E88E5":"#2C3746",
+                animation:"pop .25s ease"
               }}>
+                
                 {m.text}
+
+                <div style={s.meta}>
+
+                  {/* Time */}
+                  <small>{m.createdAt?.toDate?.()?.toLocaleTimeString([], {hour:"2-digit",minute:"2-digit"})}</small>
+
+                  {me && (
+                    <small style={{marginLeft:6,fontSize:11}}>
+                      {m.seen
+                        ? `✔✔ Seen at ${m.seenAt?.toDate?.()?.toLocaleTimeString([], {hour:"2-digit",minute:"2-digit"})}`
+                        : `✔ Delivered`
+                      }
+                    </small>
+                  )}
+                </div>
+
               </div>
             </div>
           );
         })}
-        <div ref={bottomRef}></div>
+        <div ref={bottomRef}/>
       </div>
 
-      {/* INPUT BAR */}
-      <form onSubmit={send} style={styles.inputWrap}>
-        <input
-          placeholder="Type a message..."
-          value={msg}
-          onChange={(e)=>setMsg(e.target.value)}
-          style={styles.input}
-        />
-        <button type="submit" style={styles.sendBtn}>Send</button>
+
+
+
+      {/* 🔥 INPUT BAR */}
+      <form onSubmit={send} style={s.inputRow}>
+        <input value={msg} onChange={typing} placeholder="Type message..." style={s.input}/>
+        <button style={s.send}>Send</button>
       </form>
+
     </div>
   );
 }
 
-/* ========= FULL SCREEN STYLE ========= */
-const styles = {
-  screen:{
-    height:"100vh",
-    width:"100vw",
-    display:"flex",
-    flexDirection:"column",
-    background:"#0E1621",
-    color:"white",
-    overflow:"hidden"
-  },
 
-  header:{
-    padding:"15px",
-    display:"flex",
-    justifyContent:"space-between",
-    alignItems:"center",
-    background:"#17212B",
-    borderBottom:"1px solid #1E2A39"
-  },
 
-  logout:{
-    background:"crimson",
-    border:"none",
-    color:"#fff",
-    padding:"6px 12px",
-    borderRadius:"6px"
-  },
+/* ======================= STYLES ======================= */
 
-  chatBox:{
-    flex:1,
-    overflowY:"auto",
-    padding:"14px"
-  },
+const s={
+  screen:{height:"100vh",width:"100vw",display:"flex",flexDirection:"column",background:"#0A141A",color:"#fff"},
+  header:{padding:"12px 15px",background:"#16232E",borderBottom:"1px solid #1E2E39",
+          display:"flex",justifyContent:"space-between",alignItems:"center"},
 
-  bubble:{
-    padding:"10px 14px",
-    maxWidth:"70%",
-    color:"white",
-    borderRadius:"14px",
-    fontSize:"14px",
-    lineHeight:"1.35"
-  },
+  logout:{background:"crimson",border:"none",padding:"6px 12px",borderRadius:6,
+          color:"#fff",cursor:"pointer",fontWeight:"bold"},
 
-  inputWrap:{
-    display:"flex",
-    gap:"8px",
-    padding:"10px",
-    background:"#17212B",
-    borderTop:"1px solid #1E2A39"
-  },
+  chat:{flex:1,overflowY:"auto",padding:10},
 
-  input:{
-    flex:1,
-    padding:"12px",
-    borderRadius:"8px",
-    border:"none",
-    background:"#0E1621",
-    color:"white",
-    outline:"none"
-  },
+  bubble:{maxWidth:"70%",padding:"10px 14px",borderRadius:10,fontSize:15,marginBottom:8},
+  meta:{display:"flex",justifyContent:"flex-end",gap:6,marginTop:4,fontSize:11,opacity:.9},
 
-  sendBtn:{
-    background:"#1976D2",
-    border:"none",
-    padding:"10px 16px",
-    borderRadius:"8px",
-    color:"white",
-    fontWeight:600
-  }
+  inputRow:{display:"flex",gap:10,padding:10,borderTop:"1px solid #1F2E39",background:"#16232E"},
+  input:{flex:1,padding:12,border:"none",borderRadius:8,background:"#0E1823",color:"#fff",outline:"none"},
+  send:{padding:"10px 16px",background:"#1E88E5",border:"none",borderRadius:8,color:"#fff",fontWeight:600}
 };
+
+const style=document.createElement("style");
+style.innerHTML=`@keyframes pop{0%{transform:scale(.7);opacity:.3}100%{opacity:1}}`;
+document.head.appendChild(style);
