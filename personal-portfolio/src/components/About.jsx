@@ -8,6 +8,7 @@ export default function About(){
         <div className="info">
           <p>Hello! I'm a frontend developer specializing in building (and occasionally designing) exceptional digital experiences. Currently focused on building responsive web apps with React.</p>
           <p>I enjoy turning complex problems into simple, beautiful, and intuitive designs. When I'm not coding, I like reading and traveling (placeholder text).</p>
+          <p>Interested in Machine Learning and AI technologies.</p>
         </div>
 
         <div className="info">
@@ -16,7 +17,8 @@ export default function About(){
             <li><strong>Andhara Pradesh</strong> Vijayawada</li>
             <li><strong>Education:</strong> Computer Science and Engineering</li>
             <li><strong>Availability:</strong> Student </li>
-            <li><strong>Interests:</strong> Web, UI, Accessibility</li>
+            <li><strong>Interests:</strong> Web, UI, Accessibility, Machine learning</li>
+            <li><strong>Purusing Btech CSE expected to complete in 2028</strong></li>
           </ul>
         </div>
       </div>

@@ -12,7 +12,10 @@ export default function Hero(){
       <div className="hero-card">
         <h1>Hi, I am Gireesh</h1>
         <div className="role">Frontend Developer</div>
-        <p className="tagline">I build responsive, accessible, and modern web interfaces using React.</p>
+        <p className="tagline">I build responsive, accessible, and modern web interfaces using React.
+          Also i am very interested in Machine Learning and AI technologies.
+          Database Sql Queries are most part of my interest.
+        </p>
         <div className="cta">
           <button className="btn" onClick={scrollToProjects}>View Projects</button>
           <a className="btn ghost" href="#contact">Contact Me</a>
