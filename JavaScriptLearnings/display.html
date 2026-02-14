@@ -1,0 +1,44 @@
+//using innerHTML
+To access an HTML element, you can use the document.getElementById(id) method.
+
+Use the id attribute to identify the HTML element.
+
+Then use the innerHTML property to change the HTML content of the HTML element:
+ -->
+
+<!DOCTYPE html>
+<html>
+<body>
+
+<h1>My First Web Page</h1>
+<p>My First Paragraph</p>
+
+<p id="demo"></p>
+
+<script>
+document.getElementById("demo").innerHTML = "<h2>Hello World</h2>";
+</script>
+
+</body>
+</html>
+
+
+ <!-- Using innerText
+To access an HTML element, use the document.getElementById(id) method.
+
+Then use the innerText property to change the inner text of the HTML element: -->
+<!-- <!DOCTYPE html>
+<html>
+<body>
+
+<h1>My First Web Page</h1>
+
+
+<p id="demo"></p>
+
+<script>
+document.getElementById("demo").innerText = "Hello innerText";
+</script>
+
+</body>
+</html>
