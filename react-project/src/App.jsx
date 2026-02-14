@@ -12,6 +12,8 @@ import ProfilePicture from './Profile/ProfilePicture.jsx';
 import MyComponent from './Component/MyComponent.jsx';
 import Counter from './Component/Counter.jsx';
 import OnChange from './Component/OnChangeHook.jsx';
+import ColorPicker from './color/ColorPicker.jsx';
+
 
 function App() {
   return (
@@ -37,6 +39,7 @@ function App() {
       <MyComponent /> 
       <Counter />
       <OnChange />
+      <ColorPicker />
     </>
   );
 }

@@ -24,6 +24,7 @@ function MyComponent() {
             <button onClick={incrementAge}>Increment Age</button>
             <p>Is Student : {isStudent ? "Yes" : "No"}</p>
             <button onClick={StudentStatus}>Toggle Student Status</button>
+            <input type="text" placeholder="Enter Name" onChange={(e) => setName(e.target.value)} />
         </div>
     );
     
