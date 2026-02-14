@@ -1,0 +1,114 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body, #root {
+  height: 100%;
+}
+
+body {
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  background: #f5f7fa;
+  color: #2c3e50;
+  min-height: 100vh;
+}
+
+.app {
+  display: flex;
+  min-height: 100vh;
+  background: #f5f7fa;
+}
+
+.main-content {
+  flex: 1;
+  margin-left: 260px;
+  background: #f5f7fa;
+  overflow-y: auto;
+  min-height: 100vh;
+}
+
+/* Scrollbar Styling */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #ccc;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #999;
+}
+
+/* Responsive Layout */
+@media (max-width: 768px) {
+  .main-content {
+    margin-left: 240px;
+  }
+
+  .sidebar {
+    width: 240px;
+  }
+}
+
+@media (max-width: 480px) {
+  .main-content {
+    margin-left: 220px;
+  }
+
+  .sidebar {
+    width: 220px;
+  }
+}
+
+/* Utility Classes */
+.container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+.hidden {
+  display: none;
+}
+
+.visible {
+  display: block;
+}
+
+/* Buttons Base */
+button {
+  font-family: inherit;
+  cursor: pointer;
+}
+
+button:active {
+  opacity: 0.9;
+}
+
+/* Input Focus States */
+input:focus,
+select:focus,
+textarea:focus {
+  outline: none;
+}
+
+/* Print Styles */
+@media print {
+  .sidebar,
+  .no-print {
+    display: none;
+  }
+
+  .main-content {
+    margin-left: 0;
+  }
+}
